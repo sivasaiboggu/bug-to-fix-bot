@@ -1,0 +1,7 @@
+{
+  "demo-repo/tests/test_bugs.py::test_page_1_returns_first_items": true,
+  "demo-repo/tests/test_bugs.py::test_page_2_returns_next_items": true,
+  "demo-repo/tests/test_bugs.py::test_display_name_without_profile_falls_back": true,
+  "demo-repo/tests/test_bugs.py::test_display_name_missing_profile_key_falls_back": true,
+  "demo-repo/tests/test_bugs.py::test_total_price_sums_unit_price_times_qty": true
+}

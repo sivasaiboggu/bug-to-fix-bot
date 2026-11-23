@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bug-to-fix bot — paste a log, get a tested PR</title>
+<meta name="description" content="Paste an error log. The bot finds the failing code, reproduces the bug in a sandbox, writes a patch, proves it with tests, and opens a pull request.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <span class="wordmark">bug<span>-to-fix</span> bot</span>
+    <span class="tagline">Paste a log. Get a tested PR.</span>
+    <span class="spacer"></span>
+    <button id="open-settings" type="button">Settings</button>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+    <div class="col">
+      <section class="card">
+        <h2><span class="num">01</span> — Paste the error log</h2>
+        <textarea id="log" placeholder="Paste a Python traceback here…&#10;&#10;Traceback (most recent call last):&#10;  File &quot;/app/bugs/bug1_pagination.py&quot;, line 9, in page_slice&#10;    return items[start:start + size]&#10;IndexError: list index out of range" spellcheck="false"></textarea>
+        <div class="samples">
+          <span style="color:var(--muted);font-size:12px;align-self:center;">Try a sample:</span>
+          <button type="button" data-bug="bug1_pagination">off-by-one</button>
+          <button type="button" data-bug="bug2_profile">None dereference</button>
+          <button type="button" data-bug="bug3_pricing">wrong dict key</button>
+        </div>
+        <div class="run-row">
+          <button class="btn-run" id="run" type="button">Run the pipeline</button>
+          <span class="run-state" id="run-state"></span>
+        </div>
+        <p class="note">The pasted log is only ever parsed — never executed. Reproduction runs the repo's own tests in an isolated copy with a 30-second timeout.</p>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">02</span> — Pipeline</h2>
+        <ol class="rail" id="rail"></ol>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">03</span> — What the log says</h2>
+        <div id="parsed"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">04</span> — The failing file</h2>
+        <div id="source"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">05</span> — Run history</h2>
+        <div id="history"></div>
+        <p class="note">Runs are stored in this browser only (localStorage). Nothing is sent anywhere.</p>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="card">
+        <h2><span class="num">06</span> — Sandbox reproduction log</h2>
+        <pre class="terminal" id="term"><span class="dim">The reproduction log will appear here when the pipeline runs.</span></pre>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">07</span> — The patch</h2>
+        <div id="diff"></div>
+        <div style="margin-top:14px;">
+          <button class="btn-ghost" id="ask-gemini" type="button" disabled>Ask Gemini for an alternative patch</button>
+          <p class="note" id="gemini-note">No Gemini key set. The patch used is the tested known-good fix for this seeded bug. Add a free key in Settings to get an AI suggestion as well.</p>
+          <pre class="terminal" id="gemini-out" style="margin-top:10px;max-height:200px;"></pre>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">08</span> — Tests after the fix</h2>
+        <div id="tests"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="num">09</span> — Pull request</h2>
+        <div id="pr"></div>
+        <p class="note">A real PR needs a GitHub personal access token (classic, <code>repo</code> scope) and a repo you own. Without them, no PR is opened — and no fake one is shown instead. The engine (<code>engine/bugfix.py</code>) does the same on the command line with <code>GITHUB_TOKEN</code>.</p>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>bug-to-fix bot — demo build. The 3 seeded bugs live in <code>demo-repo/</code> with real pytest tests (5 fail before a fix, 8 pass after all three). The browser demo mirrors that code; the Python engine runs the real reproduction.</p>
+  <p>Honest limits: no token, no PR. No Gemini key, no AI patch — the seeded fixes are tested and labelled. Pasted logs are never executed. <a href="README.md">README</a> · <a href="PLAN.md">Plan</a></p>
+</footer>
+
+<dialog id="settings">
+  <div class="dialog-body">
+    <h2>Settings</h2>
+    <p class="note" style="margin-top:4px;">Keys are stored in this browser only (localStorage). The Gemini key is sent only to Google's API; the GitHub token only to api.github.com. Neither is ever sent to any other server.</p>
+    <label for="set-gemini">Gemini API key (free tier, optional) — get one at AI Studio</label>
+    <input id="set-gemini" type="password" autocomplete="off" placeholder="AIza…">
+    <label for="set-token">GitHub personal access token (classic, repo scope, optional)</label>
+    <input id="set-token" type="password" autocomplete="off" placeholder="ghp_…">
+    <label for="set-owner">GitHub owner (your username or org)</label>
+    <input id="set-owner" type="text" autocomplete="off" placeholder="sivasaiboggu">
+    <label for="set-repo">GitHub repo name (a repo you own)</label>
+    <input id="set-repo" type="text" autocomplete="off" placeholder="bug-to-fix-bot">
+    <div class="run-row dialog-close">
+      <button class="btn-run" id="save-settings" type="button">Save settings</button>
+      <button class="btn-ghost" id="clear-settings" type="button">Clear saved keys</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
