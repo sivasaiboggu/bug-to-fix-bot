@@ -51,7 +51,7 @@ const BUGS = [
     id: "bug1_pagination",
     title: "Off-by-one in pagination",
     file: "bugs/bug1_pagination.py",
-    line: 9,
+    line: 10,
     func: "page_slice",
     exception: "IndexError",
     message: "list index out of range",
@@ -59,7 +59,7 @@ const BUGS = [
 `Traceback (most recent call last):
   File "/app/api.py", line 42, in list_items
     return page_slice(items, page, size)
-  File "/app/bugs/bug1_pagination.py", line 9, in page_slice
+  File "/app/bugs/bug1_pagination.py", line 10, in page_slice
     return items[start:start + size]
 IndexError: list index out of range`,
     sourceBefore: [
@@ -100,7 +100,7 @@ IndexError: list index out of range`,
     id: "bug2_profile",
     title: "None dereference in display name",
     file: "bugs/bug2_profile.py",
-    line: 8,
+    line: 9,
     func: "display_name",
     exception: "AttributeError",
     message: "'NoneType' object has no attribute 'strip'",
@@ -108,7 +108,7 @@ IndexError: list index out of range`,
 `Traceback (most recent call last):
   File "/app/views.py", line 17, in show_user
     name = display_name(user)
-  File "/app/bugs/bug2_profile.py", line 8, in display_name
+  File "/app/bugs/bug2_profile.py", line 9, in display_name
     return user["profile"]["name"].strip()
 AttributeError: 'NoneType' object has no attribute 'strip'`,
     sourceBefore: [
@@ -150,7 +150,7 @@ AttributeError: 'NoneType' object has no attribute 'strip'`,
     id: "bug3_pricing",
     title: "Wrong dict key in order totals",
     file: "bugs/bug3_pricing.py",
-    line: 8,
+    line: 9,
     func: "total_price",
     exception: "KeyError",
     message: "'price'",
@@ -158,7 +158,7 @@ AttributeError: 'NoneType' object has no attribute 'strip'`,
 `Traceback (most recent call last):
   File "/app/orders.py", line 31, in checkout
     total = total_price(order)
-  File "/app/bugs/bug3_pricing.py", line 8, in total_price
+  File "/app/bugs/bug3_pricing.py", line 9, in total_price
     return sum(item["price"] * item["qty"] for item in order["items"])
 KeyError: 'price'`,
     sourceBefore: [

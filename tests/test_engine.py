@@ -25,7 +25,7 @@ DEMO_REPO = PROJECT / "demo-repo"
 TRACE_PAGINATION = """Traceback (most recent call last):
   File "/app/api.py", line 42, in list_items
     return page_slice(items, page, size)
-  File "/app/bugs/bug1_pagination.py", line 9, in page_slice
+  File "/app/bugs/bug1_pagination.py", line 10, in page_slice
     return items[start:start + size]
 IndexError: list index out of range
 """
@@ -33,7 +33,7 @@ IndexError: list index out of range
 TRACE_NONE = """Traceback (most recent call last):
   File "/app/views.py", line 17, in show_user
     name = display_name(user)
-  File "/app/bugs/bug2_profile.py", line 8, in display_name
+  File "/app/bugs/bug2_profile.py", line 9, in display_name
     return user["profile"]["name"].strip()
 AttributeError: 'NoneType' object has no attribute 'strip'
 """
@@ -41,7 +41,7 @@ AttributeError: 'NoneType' object has no attribute 'strip'
 TRACE_KEY = """Traceback (most recent call last):
   File "/app/orders.py", line 31, in checkout
     total = total_price(order)
-  File "/app/bugs/bug3_pricing.py", line 8, in total_price
+  File "/app/bugs/bug3_pricing.py", line 9, in total_price
     return sum(item["price"] * item["qty"] for item in order["items"])
 KeyError: 'price'
 """
@@ -53,7 +53,7 @@ def test_parse_pagination_traceback():
     parsed = parse_traceback(TRACE_PAGINATION)
     assert parsed.exception_type == "IndexError"
     assert parsed.file.endswith("bug1_pagination.py")
-    assert parsed.line == 9
+    assert parsed.line == 10
     assert parsed.function == "page_slice"
 
 
@@ -62,14 +62,14 @@ def test_parse_none_dereference_traceback():
     assert parsed.exception_type == "AttributeError"
     assert "NoneType" in (parsed.message or "")
     assert parsed.file.endswith("bug2_profile.py")
-    assert parsed.line == 8
+    assert parsed.line == 9
 
 
 def test_parse_key_error_traceback():
     parsed = parse_traceback(TRACE_KEY)
     assert parsed.exception_type == "KeyError"
     assert parsed.file.endswith("bug3_pricing.py")
-    assert parsed.line == 8
+    assert parsed.line == 9
 
 
 def test_parse_uses_innermost_frame_not_first():
